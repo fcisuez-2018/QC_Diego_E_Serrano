@@ -11,6 +11,9 @@ Serrano, D.E. (2024). Learn Quantum Computing using Python. Retrived from https:
 Welcome to the **QC_Diego_E_Serrano** repository. This collection is dedicated to exploring Quantum Computing concepts through practical implementation.
 
 ## Table of Contents Start
+| Chapter | Colab Link |
+| :--- | :--- |
+
 ## Table of Contents End
 ## Overview
 This repository contains a series of Jupyter Notebooks (`.ipynb`) that cover the foundational and advanced topics of quantum information science.
