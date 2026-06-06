@@ -17,23 +17,31 @@ jobs:
         run: |
           python3 -c "
           import os
+          import glob
           
-          # 1. Gather all ipynb files from the 'chapters' directory
-          # Change to your folder path if necessary
+          # 1. Gather all ipynb files recursively under the chapters/ directory
           folder_path = 'chapters'
-          files = sorted([f for f in os.listdir(folder_path) if f.endswith('.ipynb')])
+          # '**/*.ipynb' searches all subdirectories
+          files = sorted(glob.glob(f'{folder_path}/**/*.ipynb', recursive=True))
           
+          if not files:
+              print('No files found! Check folder path.')
+              exit(1)
+
           # 2. Build the markdown table
           table = '| Chapter | Colab Link |\n| :--- | :--- |\n'
           for f in files:
-              # Clean up filename for a readable title
-              title = f.replace('.ipynb', '').replace('_', ' ')
+              # Clean up path for the title (e.g., 'chapters/part1/lesson.ipynb' -> 'part1 / lesson')
+              display_name = f.replace(f'{folder_path}/', '').replace('.ipynb', '').replace('_', ' ').replace('/', ' / ')
+              
               # Construct the Colab URL
-              link = f'https://colab.research.google.com/github/fcisuez-2018/QC_Diego_E_Serrano/blob/main/{folder_path}/{f}'
-              table += f'| {title} | [Open in Colab]({link}) |\n'
+              # Note: GitHub Actions uses forward slashes by default
+              link = f'https://colab.research.google.com/github/fcisuez-2018/QC_Diego_E_Serrano/blob/main/{f}'
+              
+              table += f'| {display_name} | [Open in Colab]({link}) |\n'
               
           # 3. Read existing README and inject table
-          with open('README.md', 'r') as f:
+          with open('README.md', 'r', encoding='utf-8') as f:
               readme = f.read()
           
           start_tag = '## Table of Contents Start'
@@ -43,8 +51,11 @@ jobs:
               before = readme.split(start_tag)[0]
               after = readme.split(end_tag)[1]
               new_readme = f'{before}{start_tag}\n{table}\n{end_tag}{after}'
-              with open('README.md', 'w') as f:
+              with open('README.md', 'w', encoding='utf-8') as f:
                   f.write(new_readme)
+              print(f'Successfully updated README with {len(files)} links.')
+          else:
+              print('Tags not found in README.md')
           "
           
       - name: Commit and Push
